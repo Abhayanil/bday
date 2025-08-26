@@ -3,16 +3,15 @@ import { Cake } from './components/Cake';
 import { AudioBlower } from './components/AudioBlower';
 import { Celebration } from './components/Celebration';
 import { FlowerBouquet } from './components/FlowerBouquet';
-import { Settings2, RotateCcw, Mic, MicOff } from 'lucide-react';
+import { RotateCcw, Mic, MicOff } from 'lucide-react';
 
 function App() {
   const [numCandles, setNumCandles] = useState(1);
-  const [personalMessage, setPersonalMessage] = useState('Happy Birthday!');
+  const [personalMessage, setPersonalMessage] = useState('Happy birthday Nithya');
   const [blownCandles, setBlownCandles] = useState<Set<number>>(new Set());
   const [showCelebration, setShowCelebration] = useState(false);
   const [hasCelebrated, setHasCelebrated] = useState(false);
   const [micEnabled, setMicEnabled] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
 
   const allCandlesBlown = blownCandles.size === numCandles && numCandles > 0;
 
@@ -96,78 +95,15 @@ function App() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-amber-500 to-sky-500 mb-6 leading-tight">
-              Happy Birthday!
+              Happy birthday Nithya
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 font-medium max-w-2xl mx-auto leading-relaxed">
               {allCandlesBlown ? personalMessage : 'Make a wish and blow out the candles! 🕯️'}
             </p>
           </div>
 
-          {/* Settings Panel */}
-          {showSettings && (
-            <div className="max-w-lg mx-auto mb-12 bg-white/95 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                  <Settings2 className="w-6 h-6 text-rose-500" />
-                  Customize Your Cake
-                </h3>
-                <button
-                  onClick={() => setShowSettings(false)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl font-light transition-colors"
-                >
-                  ×
-                </button>
-              </div>
-              
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-3">
-                    Number of Candles: {numCandles}
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="20"
-                    value={numCandles}
-                    onChange={(e) => {
-                      setNumCandles(Number(e.target.value));
-                      resetCandles();
-                    }}
-                    className="w-full h-3 bg-gradient-to-r from-rose-200 to-amber-200 rounded-full appearance-none cursor-pointer slider"
-                  />
-                  <div className="flex justify-between text-sm text-gray-500 mt-2">
-                    <span>1</span>
-                    <span>20</span>
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-3">
-                    Birthday Message
-                  </label>
-                  <input
-                    type="text"
-                    value={personalMessage}
-                    onChange={(e) => setPersonalMessage(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-400 focus:border-rose-400 transition-all text-base"
-                    placeholder="Enter your heartfelt message..."
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Controls */}
           <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {!showSettings && (
-              <button
-                onClick={() => setShowSettings(true)}
-                className="px-8 py-4 bg-gradient-to-r from-violet-500 to-rose-500 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-3 text-base"
-              >
-                <Settings2 className="w-5 h-5" />
-                Customize
-              </button>
-            )}
             
             <button
               onClick={resetCandles}
