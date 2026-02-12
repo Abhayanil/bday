@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { Sparkles, Heart } from 'lucide-react';
 
 interface Flower {
   id: number;
@@ -8,17 +9,15 @@ interface Flower {
   position: { x: number; y: number };
 }
 
-// Nicely spaced targets for flower heads relative to bouquet center
 const flowers: Flower[] = [
-  { id: 1, type: 'Rose', message: 'Even miles apart, my prayers travel with you.', color: '#e11d48', position: { x: 0, y: -60 } },
-  { id: 2, type: 'Sunflower', message: 'May your days be filled with sunshine ☀️', color: '#f59e0b', position: { x: -70, y: -40 } },
-  { id: 3, type: 'Tulip', message: 'You are braver that you feel right now.', color: '#f43f5e', position: { x: 70, y: -40 } },
-  { id: 4, type: 'Daisy', message: 'Innocence and new beginnings await 🌟', color: '#f8fafc', position: { x: -45, y: -10 } },
-  { id: 5, type: 'Lily', message: 'Rest, heal and get back stronger.', color: '#fde68a', position: { x: 45, y: -10 } },
-  { id: 6, type: 'Cherry Blossom', message: "Beauty in life's fleeting moments 🦋", color: '#fb7185', position: { x: 0, y: 10 } },
+  { id: 1, type: 'Rose', message: 'Dearest Nithya, may your heart always be filled with the love you so generously give to others. ❤️', color: '#e11d48', position: { x: 0, y: -60 } },
+  { id: 2, type: 'Sunflower', message: 'Your smile brightens every room. Never stop shining, my dear. ☀️', color: '#f59e0b', position: { x: -70, y: -40 } },
+  { id: 3, type: 'Tulip', message: 'May you always find the strength to bloom, even on the toughest days. 🌷', color: '#f43f5e', position: { x: 70, y: -40 } },
+  { id: 4, type: 'Daisy', message: "Here's to new adventures, endless laughter, and beautiful memories ahead. 🌟", color: '#f8fafc', position: { x: -45, y: -10 } },
+  { id: 5, type: 'Lily', message: 'May peace, serenity, and happiness be your constant companions. 🕊️', color: '#fde68a', position: { x: 45, y: -10 } },
+  { id: 6, type: 'Cherry Blossom', message: "You are a beautiful soul, inside and out. Celebrate every moment. 🦋", color: '#fb7185', position: { x: 0, y: 10 } },
 ];
 
-// SVG flower heads for crisp, high-quality visuals
 function FlowerHead({ type, color }: { type: Flower['type']; color: string }) {
   switch (type) {
     case 'Rose':
@@ -79,86 +78,66 @@ function FlowerHead({ type, color }: { type: Flower['type']; color: string }) {
 
 export function FlowerBouquet() {
   const [visibleFlowers, setVisibleFlowers] = useState<number>(0);
-  const [messages, setMessages] = useState<Array<{ id: number; text: string; flower: string }>>([]);
+  const [activeMessage, setActiveMessage] = useState<Flower | null>(null);
 
   const addFlower = () => {
     if (visibleFlowers < flowers.length) {
-      const newFlower = flowers[visibleFlowers];
+      const newIndex = visibleFlowers;
       setVisibleFlowers((prev) => prev + 1);
-      setMessages((prev) => [
-        ...prev,
-        { id: Date.now() + Math.random(), text: newFlower.message, flower: newFlower.type },
-      ]);
+      setActiveMessage(flowers[newIndex]);
     }
   };
 
   const resetBouquet = () => {
     setVisibleFlowers(0);
-    setMessages([]);
+    setActiveMessage(null);
   };
 
-  // Precompute stems (curved) and positions for smoother layout
   const { stemBaseX, stemBaseY, viewBox } = useMemo(
     () => ({ stemBaseX: 160, stemBaseY: 210, viewBox: '0 0 320 240' }),
     []
   );
 
   return (
-    <section className="relative bg-gradient-to-b from-emerald-50 via-rose-50 to-violet-50 py-24 min-h-screen">
-      <div className="container mx-auto px-6">
+    <section className="relative py-20 min-h-[90vh] flex flex-col justify-center overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-20 right-0 w-64 h-64 bg-rose-200/20 rounded-full blur-3xl -z-10 animate-blob"></div>
+      <div className="absolute bottom-20 left-0 w-80 h-80 bg-emerald-100/30 rounded-full blur-3xl -z-10 animate-blob animation-delay-2000"></div>
+
+      <div className="container mx-auto px-4 md:px-6">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-rose-500 to-violet-500 mb-6 leading-tight">
-            A Bouquet of Wishes
+        <div className="text-center mb-12 md:mb-20">
+          <h2 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-600 mb-6 leading-tight tracking-tight">
+            A Garden of Wishes
           </h2>
-          <p className="text-xl text-gray-600 bg-white/80 backdrop-blur-md rounded-2xl px-8 py-4 inline-block shadow-lg border border-white/30 max-w-2xl">
-            Click the bouquet to add beautiful flowers with heartfelt messages 🌸
+          <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto font-light">
+            Tap the vase to bloom a memory and reveal a heartfelt wish.
           </p>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 items-start max-w-6xl mx-auto">
-          {/* Bouquet Side */}
-          <div className="flex flex-col items-center">
-            {/* Clickable Bouquet */}
+        {/* Interactive Layout */}
+        <div className="grid lg:grid-cols-12 gap-8 md:gap-12 items-center max-w-7xl mx-auto">
+
+          {/* Bouquet Interaction Area */}
+          <div className="lg:col-span-7 flex flex-col items-center relative">
             <div
-              className="relative cursor-pointer transform hover:scale-105 transition-all duration-300 mb-8"
+              className={`relative cursor-pointer transition-all duration-500 ${visibleFlowers < flowers.length ? 'hover:scale-[1.02]' : ''}`}
               onClick={addFlower}
             >
-              {/* Elegant Vase */}
-              <div className="relative mx-auto">
-                <div className="w-48 h-64 bg-gradient-to-b from-slate-100 via-slate-200 to-slate-400 mx-auto shadow-2xl relative overflow-hidden rounded-t-lg">
-                  <div
-                    className="absolute inset-0 bg-gradient-to-b from-slate-200 via-slate-300 to-slate-500"
-                    style={{ clipPath: 'polygon(25% 0%, 75% 0%, 80% 100%, 20% 100%)' }}
-                  ></div>
-                  {/* Vase decorations */}
-                  <div className="absolute inset-x-6 top-8 h-4 bg-white/40 rounded-full shadow-inner"></div>
-                  <div className="absolute inset-x-8 top-16 h-3 bg-slate-100 rounded-full"></div>
-                  <div className="absolute inset-x-10 top-24 h-2 bg-white/60 rounded-full"></div>
-                  {/* Heart decoration */}
-                  <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 text-slate-600 text-2xl">💖</div>
-                </div>
-                {/* Vase base */}
-                <div className="w-52 h-4 bg-gradient-to-b from-slate-300 to-slate-500 rounded-full mx-auto -mt-2 shadow-lg"></div>
-              </div>
+              <div className="relative w-full max-w-[400px] mx-auto filter drop-shadow-2xl">
 
-              {/* Stems and Flowers (SVG ensures alignment) */}
-              <div className="absolute -top-8 left-1/2 -translate-x-1/2">
+                {/* SVG Container */}
                 <svg
-                  width="320"
-                  height="240"
                   viewBox={viewBox}
-                  className="overflow-visible"
+                  className="overflow-visible w-full h-auto relative z-30"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  {/* Stems */}
+                  {/* Stems with organic draw animation */}
                   {flowers.slice(0, visibleFlowers).map((f, i) => {
                     const endX = stemBaseX + f.position.x;
                     const endY = stemBaseY + f.position.y;
                     const ctrlX = stemBaseX + f.position.x * 0.4;
-                    const ctrlY = stemBaseY - 60; // arch upwards
-                    const isNew = i === visibleFlowers - 1;
+                    const ctrlY = stemBaseY - 60;
                     return (
                       <path
                         key={`stem-${f.id}`}
@@ -166,8 +145,7 @@ export function FlowerBouquet() {
                         stroke="#059669"
                         strokeWidth={4}
                         fill="none"
-                        className="drop-shadow-sm"
-                        style={isNew ? { opacity: 0, animation: 'fadeIn 500ms ease-out forwards' } : undefined}
+                        className="animate-draw drop-shadow-sm"
                         strokeLinecap="round"
                       />
                     );
@@ -177,140 +155,104 @@ export function FlowerBouquet() {
                   {flowers.slice(0, visibleFlowers).map((f, i) => {
                     const midX = stemBaseX + f.position.x * 0.5;
                     const midY = stemBaseY - 30;
-                    const isNew = i === visibleFlowers - 1;
                     return (
-                      <g key={`leaves-${f.id}`}>
+                      <g key={`leaves-${f.id}`} className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                         <path
                           d={`M ${midX} ${midY} q -14 -8 -4 -18 q 14 6 8 18 Z`}
                           fill="#10b981"
-                          style={isNew ? { opacity: 0, animation: 'fadeIn 500ms ease-out forwards', animationDelay: '120ms' } : undefined}
                         />
                         <path
                           d={`M ${midX + 10} ${midY + 10} q 14 -8 4 -18 q -14 6 -8 18 Z`}
                           fill="#059669"
-                          style={isNew ? { opacity: 0, animation: 'fadeIn 500ms ease-out forwards', animationDelay: '200ms' } : undefined}
                         />
                       </g>
                     );
                   })}
 
-                  {/* Flower heads */}
+                  {/* Blooming Flower Heads */}
                   {flowers.slice(0, visibleFlowers).map((f, i) => {
                     const endX = stemBaseX + f.position.x;
                     const endY = stemBaseY + f.position.y;
-                    const isNew = i === visibleFlowers - 1;
                     return (
                       <g key={`head-${f.id}`} transform={`translate(${endX} ${endY})`}>
-                        <g
-                          style={
-                            isNew
-                              ? {
-                                  transformOrigin: 'center',
-                                  transformBox: 'fill-box',
-                                  opacity: 0,
-                                  animation: 'popIn 500ms ease-out forwards',
-                                }
-                              : undefined
-                          }
-                        >
+                        <g className="animate-bloom" style={{ animationDelay: '0.8s' }}>
                           <FlowerHead type={f.type} color={f.color} />
                         </g>
                       </g>
                     );
                   })}
-
-                  {/* Simple animations */}
-                  <style>
-                    {`
-                      @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-                      @keyframes popIn {
-                        0% { opacity: 0; transform: scale(0.6) }
-                        70% { opacity: 1; transform: scale(1.08) }
-                        100% { transform: scale(1) }
-                      }
-                    `}
-                  </style>
                 </svg>
+
+                {/* Premium Vase */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-64 z-20 pointer-events-none">
+                  <div className="w-full h-full bg-gradient-to-b from-slate-50/80 via-slate-100/50 to-slate-300/80 backdrop-blur-sm rounded-b-[3rem] rounded-t-lg border-x border-b border-white/60 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] overflow-hidden">
+                    <div className="absolute inset-x-0 top-0 h-4 bg-white/40 skew-y-3"></div>
+                    <div className="absolute inset-x-8 bottom-8 h-32 bg-gradient-to-t from-emerald-50/30 to-transparent rounded-full blur-xl"></div>
+                  </div>
+                </div>
               </div>
 
-              {/* Click indicator */}
+              {/* Call to Action Pulse */}
               {visibleFlowers < flowers.length && (
-                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-rose-500 text-white px-6 py-2 rounded-full text-sm font-semibold animate-pulse shadow-lg">
-                  Click to add flower! 🌸
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+                  <div className="w-20 h-20 bg-white/30 rounded-full animate-ping"></div>
                 </div>
               )}
             </div>
 
-            {/* Controls */}
-            <div className="flex gap-4 mb-8">
-              <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-white/30 text-center">
-                <div className="text-lg font-semibold text-gray-700 mb-2">
-                  Progress: {visibleFlowers} / {flowers.length}
-                </div>
-                <div className="w-48 bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
-                  <div
-                    className="h-full bg-gradient-to-r from-emerald-400 via-rose-400 to-violet-400 rounded-full transition-all duration-500 ease-out"
-                    style={{ width: `${(visibleFlowers / flowers.length) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
+            {/* Progress Bar */}
+            <div className="mt-8 w-64 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 transition-all duration-700 ease-out"
+                style={{ width: `${(visibleFlowers / flowers.length) * 100}%` }}
+              />
             </div>
-
             {visibleFlowers > 0 && (
               <button
                 onClick={resetBouquet}
-                className="px-6 py-3 bg-gradient-to-r from-gray-500 to-slate-600 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                className="mt-4 text-sm text-slate-400 hover:text-slate-600 transition-colors"
               >
-                Reset Bouquet
+                Restart Experience
               </button>
             )}
           </div>
 
-          {/* Messages Side */}
-          <div className="space-y-4">
-            <h3 className="text-3xl font-bold text-gray-800 mb-6 text-center">Your Messages 💌</h3>
+          {/* Wish Card Display */}
+          <div className="lg:col-span-5 h-[300px] lg:h-[400px] flex items-center justify-center">
+            {activeMessage ? (
+              <div key={activeMessage.id} className="w-full animate-fade-in-up">
+                <div className="glass-card rounded-[2rem] p-8 md:p-12 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-rose-100 to-transparent opacity-50 rounded-bl-[100%] transition-transform group-hover:scale-110"></div>
 
-            {messages.length === 0 ? (
-              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-8 text-center shadow-lg border border-white/30">
-                <div className="text-6xl mb-4 opacity-50">🌸</div>
-                <p className="text-gray-600 text-lg">Click the bouquet to start collecting beautiful messages!</p>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-rose-50 rounded-xl">
+                      <Sparkles className="w-6 h-6 text-rose-400" />
+                    </div>
+                    <span className="text-sm font-bold tracking-widest text-rose-400 uppercase">
+                      {activeMessage.type}
+                    </span>
+                  </div>
+
+                  <p className="text-xl md:text-2xl text-slate-700 font-medium leading-relaxed mb-6 font-serif">
+                    "{activeMessage.message}"
+                  </p>
+
+                  <div className="flex items-center gap-2 text-slate-400 text-sm">
+                    <Heart className="w-4 h-4 fill-current text-rose-300" />
+                    <span>Sent with love</span>
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
-                {messages.map((message, index) => (
-                  <div
-                    key={message.id}
-                    className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-white/30 transform transition-all duration-500 hover:scale-105"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="text-sm font-semibold px-3 py-1 rounded-full bg-rose-100 text-rose-700">
-                        {message.flower}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-gray-800 font-medium leading-relaxed">{message.text}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Completion Message */}
-            {visibleFlowers === flowers.length && (
-              <div className="bg-gradient-to-r from-emerald-100 via-rose-100 to-violet-100 rounded-3xl p-8 shadow-2xl border-2 border-rose-300 animate-pulse mt-8">
-                <div className="text-center">
-                  <div className="text-6xl mb-4">🎊</div>
-                  <h4 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-rose-500 to-violet-500 mb-4">
-                    Bouquet Complete!
-                  </h4>
-                  <p className="text-gray-700 leading-relaxed">
-                    You've collected all the beautiful flowers and their heartfelt messages. May these wishes bring endless joy to your special day! 🌸✨
-                  </p>
+              <div className="text-center text-slate-300 animate-pulse">
+                <div className="w-16 h-16 border-2 border-slate-200 border-dashed rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <span className="text-2xl">🌱</span>
                 </div>
+                <p className="text-lg">Tap the vase to grow a wish</p>
               </div>
             )}
           </div>
+
         </div>
       </div>
     </section>
